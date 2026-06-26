@@ -52,7 +52,7 @@ public class NeuerWein extends HttpServlet {
     PrintWriter pw = resp.getWriter();
     if (StringUtils.isBlank(name)) {
       req.setAttribute(ERROR_MSG_PARAM,"Name darf nicht leer sein.");
-      req.getRequestDispatcher("/neuer-wein.jsp").forward(req, resp);
+      req.getRequestDispatcher("/neuer-kuenstler.jsp").forward(req, resp);
       return;
     }
 
@@ -75,7 +75,7 @@ public class NeuerWein extends HttpServlet {
       req.setAttribute(ERROR_MSG_PARAM, e.getMessage());
     }
     req.setAttribute(WEINE, getWeineFromWeingut(wein.getErzeuger().getWeingut()));
-    req.getRequestDispatcher("/neuer-wein.jsp").forward(req, resp);
+    req.getRequestDispatcher("/neuer-kuenstler.jsp").forward(req, resp);
   }
   
   private void createWeinUsingJpa(Wein wein) {
