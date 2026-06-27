@@ -1,0 +1,16 @@
+@import url('bootstrap/css/bootstrap.min.css');
+
+table.data {
+  border: 1px solid grey;
+  empty-cells: show;
+  border-collapse: collapse;
+}
+
+table.data th {
+  background: lightgrey;
+}
+
+table.data td, table.data th {
+  border: 1px solid grey;
+  padding: 4px;
+}
