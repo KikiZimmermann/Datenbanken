@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/sql" prefix="sql" %>
 <%
     // Schritt 2: Aufführungsdaten aus dem POST in die Session speichern
     String datum = request.getParameter("datum");
@@ -54,8 +55,20 @@
     </table>
 
     <h2>Sitzplatz wählen</h2>
-    <!-- SVNr des eingeloggten Besuchers (Schritt 1) wird automatisch verwendet -->
     <p>Reservierung für: <strong>${sessionScope.besName}</strong> (KDNr: ${sessionScope.kdnr})</p>
+
+    <sql:setDataSource dataSource="jdbc/theaterDB" />
+    <sql:query var="BELEGT">
+      SELECT Sitzplatz FROM RESERVIEREN ORDER BY Sitzplatz
+    </sql:query>
+    <c:if test="${BELEGT.rowCount > 0}">
+      <p style="color: grey;">
+        Bereits belegte Sitzplätze:
+        <c:forEach var="b" items="${BELEGT.rows}" varStatus="s">
+          <strong>${b.sitzplatz}</strong><c:if test="${!s.last}">, </c:if>
+        </c:forEach>
+      </p>
+    </c:if>
 
     <form method="POST" action="${contextPath}/Reservierung">
       <table>

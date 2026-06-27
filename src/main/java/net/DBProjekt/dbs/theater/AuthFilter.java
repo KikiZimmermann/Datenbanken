@@ -15,7 +15,7 @@ public class AuthFilter implements Filter {
 
     // Seiten die Besucher (Kunden) sehen dürfen
     private static final Set<String> BESUCHER_PFADE = Set.of(
-        "/besucher.jsp", "/auffuehrung.jsp", "/reservierung.jsp", "/Reservierung"
+        "/besucher.jsp", "/auffuehrung.jsp", "/reservierung.jsp", "/Reservierung", "/StorniereReservierung"
     );
 
     @Override

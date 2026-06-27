@@ -21,7 +21,91 @@
 <h1>Theaterverwaltung</h1>
 <h2>Willkommen, ${sessionScope.besName}!</h2>
 
+<c:if test="${not empty sessionScope.erfolg}">
+  <p style="color: green; font-weight: bold;">${sessionScope.erfolg}</p>
+  <c:remove var="erfolg" scope="session"/>
+</c:if>
+<c:if test="${not empty sessionScope.fehler}">
+  <p style="color: red;">${sessionScope.fehler}</p>
+  <c:remove var="fehler" scope="session"/>
+</c:if>
+
 <sql:setDataSource dataSource="jdbc/theaterDB" />
+
+<!-- ===== Lieblingskünstler ===== -->
+<h3>Mein Lieblingskünstler</h3>
+
+<sql:query var="LIEBLING">
+  SELECT k.KName, k.Datum
+  FROM BESUCHER b
+  JOIN KUENSTLER k ON b.LieblingsKuenstler = k.SVNr
+  WHERE b.SVNr = ?
+  <sql:param value="${sessionScope.svnr}"/>
+</sql:query>
+
+<c:choose>
+  <c:when test="${LIEBLING.rowCount == 0}">
+    <p style="color: grey;">Kein Lieblingskünstler eingetragen.</p>
+  </c:when>
+  <c:otherwise>
+    <c:forEach var="l" items="${LIEBLING.rows}">
+      <p>&#9733; <strong>${l.kname}</strong></p>
+    </c:forEach>
+  </c:otherwise>
+</c:choose>
+
+<hr/>
+
+<!-- ===== Meine Reservierungen ===== -->
+<h3>Meine Reservierungen</h3>
+
+<sql:query var="MEINE_RES">
+  SELECT r.Datum, r.Uhrzeit, r.ResNr, r.Sitzplatz, a.Name
+  FROM RESERVIEREN r
+  JOIN AUFFUEHRUNG a ON r.Datum = a.Datum AND r.Uhrzeit = a.Uhrzeit
+  WHERE r.SVNr = ?
+  ORDER BY r.Datum, r.Uhrzeit
+  <sql:param value="${sessionScope.svnr}"/>
+</sql:query>
+
+<c:choose>
+  <c:when test="${MEINE_RES.rowCount == 0}">
+    <p style="color: grey;">Keine Reservierungen vorhanden.</p>
+  </c:when>
+  <c:otherwise>
+    <table class="data table-striped">
+      <tr>
+        <th>ResNr</th>
+        <th>Theaterstück</th>
+        <th>Datum</th>
+        <th>Uhrzeit</th>
+        <th>Sitzplatz</th>
+        <th>Aktion</th>
+      </tr>
+      <c:forEach var="r" items="${MEINE_RES.rows}">
+        <tr>
+          <td>${r.resnr}</td>
+          <td>${r.name}</td>
+          <td>${r.datum}</td>
+          <td>${r.uhrzeit}</td>
+          <td>${r.sitzplatz}</td>
+          <td>
+            <form method="POST" action="${contextPath}/StorniereReservierung" style="display:inline;">
+              <input type="hidden" name="datum" value="${r.datum}"/>
+              <input type="hidden" name="uhrzeit" value="${r.uhrzeit}"/>
+              <button type="submit" class="btn btn-secondary"
+                      onclick="return confirm('Reservierung wirklich stornieren?')">
+                Stornieren
+              </button>
+            </form>
+          </td>
+        </tr>
+      </c:forEach>
+    </table>
+  </c:otherwise>
+</c:choose>
+
+<hr/>
 
 <!-- ===== Künstler suchen ===== -->
 <h3>Künstler suchen</h3>

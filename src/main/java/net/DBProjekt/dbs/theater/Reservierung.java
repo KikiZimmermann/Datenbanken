@@ -44,6 +44,39 @@ public class Reservierung extends HttpServlet {
             InitialContext ctx = new InitialContext();
             DataSource ds = (DataSource) ctx.lookup("java:comp/env/jdbc/theaterDB");
             try (Connection con = ds.getConnection()) {
+
+                // Sitzplatz bereits vergeben? (UNIQUE Sitzplatz)
+                try (PreparedStatement ps = con.prepareStatement(
+                        "SELECT COUNT(*) FROM RESERVIEREN WHERE Sitzplatz = ?")) {
+                    ps.setString(1, sitzplatz);
+                    try (ResultSet rs = ps.executeQuery()) {
+                        rs.next();
+                        if (rs.getInt(1) > 0) {
+                            session.setAttribute("fehler",
+                                    "Sitzplatz \"" + sitzplatz + "\" ist bereits reserviert. Bitte einen anderen wählen.");
+                            resp.sendRedirect(req.getContextPath() + "/reservierung.jsp");
+                            return;
+                        }
+                    }
+                }
+
+                // Besucher hat bereits Reservierung für diese Aufführung? (PK-Constraint)
+                try (PreparedStatement ps = con.prepareStatement(
+                        "SELECT COUNT(*) FROM RESERVIEREN WHERE SVNr = ? AND Datum = ? AND Uhrzeit = ?")) {
+                    ps.setString(1, svnr);
+                    ps.setDate(2, datum);
+                    ps.setTime(3, uhrzeit);
+                    try (ResultSet rs = ps.executeQuery()) {
+                        rs.next();
+                        if (rs.getInt(1) > 0) {
+                            session.setAttribute("fehler",
+                                    "Sie haben für diese Aufführung bereits eine Reservierung.");
+                            resp.sendRedirect(req.getContextPath() + "/reservierung.jsp");
+                            return;
+                        }
+                    }
+                }
+
                 int resNr;
                 try (PreparedStatement ps = con.prepareStatement(
                         "SELECT COALESCE(MAX(ResNr), 0) + 1 FROM RESERVIEREN");
@@ -51,6 +84,7 @@ public class Reservierung extends HttpServlet {
                     rs.next();
                     resNr = rs.getInt(1);
                 }
+
                 try (PreparedStatement ps = con.prepareStatement(
                         "INSERT INTO RESERVIEREN (SVNr, Datum, Uhrzeit, ResNr, Sitzplatz) VALUES (?, ?, ?, ?, ?)")) {
                     ps.setString(1, svnr);
@@ -62,7 +96,6 @@ public class Reservierung extends HttpServlet {
                 }
                 session.setAttribute("erfolg", "Reservierung Nr. " + resNr +
                         " für Sitzplatz " + sitzplatz + " erfolgreich angelegt!");
-                // Aufführungsdaten aus Session entfernen
                 session.removeAttribute("aufDatum");
                 session.removeAttribute("aufUhrzeit");
                 session.removeAttribute("aufName");

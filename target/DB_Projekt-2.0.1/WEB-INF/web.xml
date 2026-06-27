@@ -51,6 +51,15 @@
   </servlet-mapping>
 
   <servlet>
+    <servlet-name>StorniereReservierung</servlet-name>
+    <servlet-class>net.DBProjekt.dbs.theater.StorniereReservierung</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>StorniereReservierung</servlet-name>
+    <url-pattern>/StorniereReservierung</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
     <servlet-name>Zurueckgeben</servlet-name>
     <servlet-class>net.DBProjekt.dbs.theater.Zurueckgeben</servlet-class>
   </servlet>
