@@ -13,6 +13,10 @@
 
 <body>
 
+<div style="float: right;">
+  <a href="${contextPath}/Logout" class="btn btn-secondary">Abmelden</a>
+</div>
+
 <h1>Kuenstler</h1>
 
 <form method="GET" action="">
@@ -32,28 +36,28 @@
 
 <!-- Default: alle Künstler -->
 <c:if test="${empty param.wName}">
-  <sql:query var="kuenstler">
-    SELECT * FROM kuenstler
+  <sql:query var="KUENSTLER">
+    SELECT * FROM KUENSTLER
   </sql:query>
 </c:if>
 
 <!-- Suche nach Name -->
 <c:if test="${not empty param.wName}">
-  <sql:query var="kuenstler">
+  <sql:query var="KUENSTLER">
     SELECT KName, SVNr, Datum
-    FROM kuenstler
+    FROM KUENSTLER
     WHERE KName LIKE ?
     <sql:param value="%${param.wName}%" />
   </sql:query>
 </c:if>
 
 <!-- keine Ergebnisse -->
-<c:if test="${kuenstler.rowCount == 0}">
+<c:if test="${KUENSTLER.rowCount == 0}">
   <p style="color: red;">Keine Einträge gefunden!</p>
 </c:if>
 
 <!-- Tabelle -->
-<c:if test="${kuenstler.rowCount > 0}">
+<c:if test="${KUENSTLER.rowCount > 0}">
   <table class="data table-striped">
     <tr>
       <th>Künstlername</th>
@@ -61,7 +65,7 @@
       <th>Datum</th>
     </tr>
 
-    <c:forEach var="k" items="${kuenstler.rows}">
+    <c:forEach var="k" items="${KUENSTLER.rows}">
       <tr>
         <td>${k.kname}</td>
         <td>${k.svnr}</td>
