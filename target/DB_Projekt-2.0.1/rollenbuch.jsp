@@ -29,6 +29,28 @@
         <c:redirect url="rollenbuch.jsp"/>
 </c:if>
 
+<c:if test="${param.action == 'hinzufuegen'}">
+    <sql:query var="invnrCheck">
+        SELECT COUNT(*) AS cnt FROM ROLLENBUCH WHERE INVNr = ? AND ISBN = ?
+        <sql:param value="${param.invnr}"/>
+        <sql:param value="${param.isbn}"/>
+    </sql:query>
+    <c:forEach var="r" items="${invnrCheck.rows}">
+        <c:if test="${r.cnt > 0}">
+            <c:set var="fehler" value="INVNr ${param.invnr} existiert für dieses Theaterstück bereits." scope="session"/>
+            <c:redirect url="rollenbuch.jsp"/>
+        </c:if>
+    </c:forEach>
+
+    <sql:update>
+        INSERT INTO ROLLENBUCH (INVNr, ISBN) VALUES (?, ?)
+        <sql:param value="${param.invnr}"/>
+        <sql:param value="${param.isbn}"/>
+    </sql:update>
+    <c:set var="erfolg" value="Rollenbuch (INVNr: ${param.invnr}) erfolgreich hinzugefügt." scope="session"/>
+    <c:redirect url="rollenbuch.jsp"/>
+</c:if>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -154,6 +176,36 @@
         </table>
     </c:otherwise>
 </c:choose>
+
+<hr/>
+<h2>Neues Rollenbuch hinzufügen</h2>
+
+<sql:query var="STUECKE">
+    SELECT ISBN, Name FROM THEATERSTUECK ORDER BY Name
+</sql:query>
+
+<form method="POST" action="${contextPath}/rollenbuch.jsp">
+    <input type="hidden" name="action" value="hinzufuegen"/>
+    <table>
+        <tr>
+            <td>INVNr:</td>
+            <td><input type="number" name="invnr" class="form-control" required placeholder="z.B. 101"/></td>
+        </tr>
+        <tr>
+            <td>Theaterstück:</td>
+            <td>
+                <select name="isbn" class="form-control">
+                    <c:forEach var="s" items="${STUECKE.rows}">
+                        <option value="${s.isbn}">${s.name} (ISBN: ${s.isbn})</option>
+                    </c:forEach>
+                </select>
+            </td>
+        </tr>
+    </table>
+    <div style="margin-top: 10px;">
+        <button type="submit" class="btn btn-primary">Hinzufügen</button>
+    </div>
+</form>
 
 </body>
 </html>
