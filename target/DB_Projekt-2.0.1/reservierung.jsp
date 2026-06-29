@@ -24,7 +24,9 @@
     </c:if>
 
     <sql:query var="sitzplatzCheck">
-        SELECT COUNT(*) AS cnt FROM RESERVIEREN WHERE Sitzplatz = ?
+        SELECT COUNT(*) AS cnt FROM RESERVIEREN WHERE Datum = ? AND Uhrzeit = ? AND Sitzplatz = ?
+        <sql:param value="${sessionScope.aufDatum}"/>
+        <sql:param value="${sessionScope.aufUhrzeit}"/>
         <sql:param value="${param.sitzplatz}"/>
     </sql:query>
     <c:forEach var="r" items="${sitzplatzCheck.rows}">

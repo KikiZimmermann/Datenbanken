@@ -27,8 +27,9 @@
     </c:if>
 
     <sql:query var="entlCheck">
-        SELECT COUNT(*) AS cnt FROM ENTLEHNUNG WHERE INVNr = ?
+        SELECT COUNT(*) AS cnt FROM ENTLEHNUNG WHERE INVNr = ? AND ISBN = ?
         <sql:param value="${sessionScope.rbInvnr}"/>
+        <sql:param value="${sessionScope.rbIsbn}"/>
     </sql:query>
     <c:forEach var="r" items="${entlCheck.rows}">
         <c:if test="${r.cnt > 0}">
@@ -51,15 +52,17 @@
     <c:choose>
         <c:when test="${istKuenstler}">
             <sql:update>
-                INSERT INTO ENTLEHNUNG (INVNr, KuenstlerSVNr, BuehnenarbeiterSVNr) VALUES (?, ?, NULL)
+                INSERT INTO ENTLEHNUNG (INVNr, ISBN, KuenstlerSVNr, BuehnenarbeiterSVNr) VALUES (?, ?, ?, NULL)
                 <sql:param value="${sessionScope.rbInvnr}"/>
+                <sql:param value="${sessionScope.rbIsbn}"/>
                 <sql:param value="${sessionScope.svnr}"/>
             </sql:update>
         </c:when>
         <c:otherwise>
             <sql:update>
-                INSERT INTO ENTLEHNUNG (INVNr, KuenstlerSVNr, BuehnenarbeiterSVNr) VALUES (?, NULL, ?)
+                INSERT INTO ENTLEHNUNG (INVNr, ISBN, KuenstlerSVNr, BuehnenarbeiterSVNr) VALUES (?, ?, NULL, ?)
                 <sql:param value="${sessionScope.rbInvnr}"/>
+                <sql:param value="${sessionScope.rbIsbn}"/>
                 <sql:param value="${sessionScope.svnr}"/>
             </sql:update>
         </c:otherwise>

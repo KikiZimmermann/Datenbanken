@@ -13,8 +13,9 @@
 
 <c:if test="${param.action == 'zurueckgeben'}">
         <sql:update var="anzahl">
-            DELETE FROM ENTLEHNUNG WHERE INVNr = ? AND (KuenstlerSVNr = ? OR BuehnenarbeiterSVNr = ?)
+            DELETE FROM ENTLEHNUNG WHERE INVNr = ? AND ISBN = ? AND (KuenstlerSVNr = ? OR BuehnenarbeiterSVNr = ?)
             <sql:param value="${param.invnr}"/>
+            <sql:param value="${param.isbn}"/>
             <sql:param value="${sessionScope.svnr}"/>
             <sql:param value="${sessionScope.svnr}"/>
         </sql:update>
@@ -96,7 +97,7 @@
         COALESCE(pk.Nachname, pb.Nachname) AS EntlehnerNachname
         FROM ROLLENBUCH r
         JOIN THEATERSTUECK t ON r.ISBN = t.ISBN
-        LEFT JOIN ENTLEHNUNG e ON r.INVNr = e.INVNr
+        LEFT JOIN ENTLEHNUNG e ON r.INVNr = e.INVNr AND r.ISBN = e.ISBN
         LEFT JOIN KUENSTLER k ON e.KuenstlerSVNr = k.SVNr
         LEFT JOIN PERSON pk ON k.SVNr = pk.SVNr
         LEFT JOIN BUEHNENARBEITER ba ON e.BuehnenarbeiterSVNr = ba.SVNr
@@ -112,7 +113,7 @@
         COALESCE(pk.Nachname, pb.Nachname) AS EntlehnerNachname
         FROM ROLLENBUCH r
         JOIN THEATERSTUECK t ON r.ISBN = t.ISBN
-        LEFT JOIN ENTLEHNUNG e ON r.INVNr = e.INVNr
+        LEFT JOIN ENTLEHNUNG e ON r.INVNr = e.INVNr AND r.ISBN = e.ISBN
         LEFT JOIN KUENSTLER k ON e.KuenstlerSVNr = k.SVNr
         LEFT JOIN PERSON pk ON k.SVNr = pk.SVNr
         LEFT JOIN BUEHNENARBEITER ba ON e.BuehnenarbeiterSVNr = ba.SVNr
@@ -166,6 +167,7 @@
                                 <form method="POST" action="${contextPath}/rollenbuch.jsp" style="display:inline;">
                                     <input type="hidden" name="action" value="zurueckgeben"/>
                                     <input type="hidden" name="invnr" value="${b.invnr}"/>
+                                    <input type="hidden" name="isbn" value="${b.isbn}"/>
                                     <button type="submit" class="btn btn-secondary">Zurückgeben</button>
                                 </form>
                             </c:otherwise>
