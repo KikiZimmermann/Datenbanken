@@ -12,12 +12,21 @@
 <sql:setDataSource dataSource="jdbc/theaterDB"/>
 
 <c:if test="${param.action == 'zurueckgeben'}">
-    <sql:update>
-        DELETE FROM ENTLEHNUNG WHERE INVNr = ?
-        <sql:param value="${param.invnr}"/>
-    </sql:update>
-    <c:set var="erfolg" value="Rollenbuch (INVNr: ${param.invnr}) erfolgreich zurückgegeben." scope="session"/>
-    <c:redirect url="rollenbuch.jsp"/>
+        <sql:update var="anzahl">
+            DELETE FROM ENTLEHNUNG WHERE INVNr = ? AND (KuenstlerSVNr = ? OR BuehnenarbeiterSVNr = ?)
+            <sql:param value="${param.invnr}"/>
+            <sql:param value="${sessionScope.svnr}"/>
+            <sql:param value="${sessionScope.svnr}"/>
+        </sql:update>
+        <c:choose>
+            <c:when test="${anzahl == 1}">
+                <c:set var="erfolg" value="Rollenbuch (INVNr: ${param.invnr}) erfolgreich zurückgegeben." scope="session"/>
+            </c:when>
+            <c:otherwise>
+                <c:set var="fehler" value="Rollenbuch konnte nicht zurückgegeben werden." scope="session"/>
+            </c:otherwise>
+        </c:choose>
+        <c:redirect url="rollenbuch.jsp"/>
 </c:if>
 
 <!DOCTYPE html>
